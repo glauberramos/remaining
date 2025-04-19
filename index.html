@@ -54,7 +54,7 @@
         align-items: center;
         justify-content: center;
         font-size: 1.3rem;
-        font-weight: 500;
+        font-weight: 700;
         mix-blend-mode: difference;
         color: white;
         margin-top: 20px;
@@ -133,11 +133,17 @@
       .regrets-grid {
         margin-bottom: 20px;
       }
+
+      .year-progress-container {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-top: 20px;
+      }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>My remaining life</h1>
+      <h1>My Remaining Life</h1>
 
       <div class="age-input-container">
         <div class="age-input-row">
@@ -172,14 +178,14 @@
           <div class="stats grid-container" id="stats"></div>
 
           <div class="grid-container">
-            <h2>Yout life in years</h2>
+            <h2>Yout Life in Years</h2>
             <div class="progress-grid" id="progressGrid"></div>
           </div>
         </div>
 
         <div class="regrets-container">
           <div class="grid-container regrets-grid">
-            <h2>Top 5 regrets of the dying</h2>
+            <h2>Top 5 Regrets of the Dying</h2>
             <div class="regrets" id="regrets">
               <div class="regret">
                 <p>
@@ -202,12 +208,12 @@
             </div>
           </div>
           <div class="grid-container">
-            <div>
+            <div class="year-progress-container">
               Current Year Progress
               <div class="year-percentage" id="year-percentage"></div>
-              <div class="progress-bar">
-                <div class="progress-fill" id="yearProgressFill"></div>
-              </div>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="yearProgressFill"></div>
             </div>
           </div>
         </div>
