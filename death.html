@@ -205,6 +205,9 @@
             <div>
               Current Year Progress
               <div class="year-percentage" id="year-percentage"></div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="yearProgressFill"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -256,6 +259,13 @@
         var start = new Date(now.getFullYear(), 0, 0);
         var end = new Date(now.getFullYear() + 1, 0, 0);
         var done = (now - start) / (end - start);
+
+        // Update the year progress bar
+        const yearProgressFill = document.getElementById("yearProgressFill");
+        if (yearProgressFill) {
+          yearProgressFill.style.width = `${Math.floor(done * 100)}%`;
+        }
+
         return Math.floor(done * 100) + "%";
       }
 
