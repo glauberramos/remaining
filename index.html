@@ -62,7 +62,7 @@
         font-weight: 700;
         mix-blend-mode: difference;
         color: white;
-        margin-top: 20px;
+        margin-top: 10px;
       }
 
       .progress-container {
@@ -138,7 +138,7 @@
       .year-progress-container {
         font-size: 1.3rem;
         font-weight: 700;
-        margin-top: 20px;
+        margin-top: 10px;
       }
 
       input[type="date"] {
@@ -209,7 +209,7 @@
         border-radius: 4px;
         cursor: pointer;
         font-size: 1rem;
-        margin-bottom: 10px;
+        margin-left: 10px;
       }
 
       .bucket-button:hover {
@@ -261,6 +261,17 @@
         justify-content: flex-end;
         gap: 10px;
         margin-top: 15px;
+      }
+
+      .bucket-list-header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .bucket-list-header h2 {
+        margin: 0;
       }
 
       @media (max-width: 900px) {
@@ -348,10 +359,10 @@
           </div>
 
           <div class="grid-container bucket-list-container">
-            <h2>Bucket List</h2>
-            <button id="add-bucket-item" class="bucket-button">
-              Add New Item
-            </button>
+            <div class="bucket-list-header">
+              <h2>Bucket List</h2>
+              <button id="add-bucket-item" class="bucket-button">Add</button>
+            </div>
             <div id="bucket-list-items" class="bucket-list-items"></div>
             <div id="bucket-list-progress" class="bucket-list-progress">
               <div class="progress-bar">
