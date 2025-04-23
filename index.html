@@ -149,6 +149,121 @@
         font-size: 1.4rem;
       }
 
+      .bucket-list-container {
+        margin-top: 20px;
+      }
+
+      .bucket-list-items {
+        text-align: left;
+        margin: 15px 0;
+      }
+
+      .bucket-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        padding: 5px;
+        border-radius: 4px;
+      }
+
+      .bucket-item:hover {
+        background-color: #333;
+      }
+
+      .bucket-item input[type="checkbox"] {
+        margin-right: 10px;
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+      .bucket-item label {
+        flex-grow: 1;
+        cursor: pointer;
+      }
+
+      .bucket-item.completed label {
+        text-decoration: line-through;
+        opacity: 0.7;
+      }
+
+      .delete-button {
+        background: none;
+        border: none;
+        color: #ff6b6b;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0 8px;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+      }
+
+      .delete-button:hover {
+        opacity: 1;
+      }
+
+      .bucket-button {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        margin-bottom: 10px;
+      }
+
+      .bucket-button:hover {
+        background-color: #444;
+      }
+
+      .bucket-stats {
+        margin-top: 10px;
+        font-size: 1.1rem;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background-color: #222;
+        padding: 20px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 500px;
+      }
+
+      .modal-content h3 {
+        margin-top: 0;
+      }
+
+      .modal-content input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        background-color: #333;
+        border: none;
+        color: white;
+        border-radius: 4px;
+      }
+
+      .modal-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
       @media (max-width: 900px) {
         .life-container {
           flex-direction: column;
@@ -231,6 +346,36 @@
               <div class="progress-fill" id="yearProgressFill"></div>
             </div>
           </div>
+
+          <div class="grid-container bucket-list-container">
+            <h2>Bucket List</h2>
+            <button id="add-bucket-item" class="bucket-button">
+              Add New Item
+            </button>
+            <div id="bucket-list-items" class="bucket-list-items"></div>
+            <div id="bucket-list-progress" class="bucket-list-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" id="bucketProgressFill"></div>
+              </div>
+              <div class="bucket-stats" id="bucket-stats">0% completed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for adding bucket list items -->
+    <div id="bucket-modal" class="modal">
+      <div class="modal-content">
+        <h3>Add Bucket List Item</h3>
+        <input
+          type="text"
+          id="bucket-item-input"
+          placeholder="What do you want to do before you die?"
+        />
+        <div class="modal-buttons">
+          <button id="cancel-bucket-item" class="bucket-button">Cancel</button>
+          <button id="save-bucket-item" class="bucket-button">Save</button>
         </div>
       </div>
     </div>
@@ -340,6 +485,145 @@
             updateLifeProgress();
           }
         });
+
+      // Bucket List Functionality
+      let bucketListItems =
+        JSON.parse(localStorage.getItem("bucketList")) || [];
+      const bucketListContainer = document.getElementById("bucket-list-items");
+      const bucketModal = document.getElementById("bucket-modal");
+      const bucketItemInput = document.getElementById("bucket-item-input");
+      const bucketProgressFill = document.getElementById("bucketProgressFill");
+      const bucketStats = document.getElementById("bucket-stats");
+
+      // Load bucket list items
+      function loadBucketList() {
+        bucketListContainer.innerHTML = "";
+
+        if (bucketListItems.length === 0) {
+          bucketListContainer.innerHTML =
+            "<p>Your bucket list is empty. Add something you want to accomplish!</p>";
+          return;
+        }
+
+        bucketListItems.forEach((item, index) => {
+          const itemElement = document.createElement("div");
+          itemElement.className = `bucket-item ${
+            item.completed ? "completed" : ""
+          }`;
+
+          itemElement.innerHTML = `
+            <input type="checkbox" id="bucket-${index}" ${
+            item.completed ? "checked" : ""
+          }>
+            <label for="bucket-${index}">${item.description}</label>
+            <button class="delete-button" data-index="${index}">×</button>
+          `;
+
+          bucketListContainer.appendChild(itemElement);
+
+          // Add event listener to checkbox
+          const checkbox = itemElement.querySelector('input[type="checkbox"]');
+          checkbox.addEventListener("change", () => {
+            bucketListItems[index].completed = checkbox.checked;
+            itemElement.classList.toggle("completed", checkbox.checked);
+            saveBucketList();
+            updateBucketProgress();
+          });
+
+          // Add event listener to delete button
+          const deleteButton = itemElement.querySelector(".delete-button");
+          deleteButton.addEventListener("click", (e) => {
+            const index = parseInt(e.target.getAttribute("data-index"));
+            deleteBucketItem(index);
+          });
+        });
+
+        updateBucketProgress();
+      }
+
+      // Save bucket list to localStorage
+      function saveBucketList() {
+        localStorage.setItem("bucketList", JSON.stringify(bucketListItems));
+      }
+
+      // Update bucket list progress bar
+      function updateBucketProgress() {
+        if (bucketListItems.length === 0) {
+          bucketProgressFill.style.width = "0%";
+          bucketStats.textContent = "0% completed";
+          return;
+        }
+
+        const completedItems = bucketListItems.filter(
+          (item) => item.completed
+        ).length;
+        const percentage = Math.floor(
+          (completedItems / bucketListItems.length) * 100
+        );
+
+        bucketProgressFill.style.width = `${percentage}%`;
+        bucketStats.textContent = `${percentage}% completed (${completedItems}/${bucketListItems.length})`;
+      }
+
+      // Open modal to add new bucket list item
+      document
+        .getElementById("add-bucket-item")
+        .addEventListener("click", () => {
+          bucketModal.style.display = "flex";
+          bucketItemInput.focus();
+        });
+
+      // Cancel adding item
+      document
+        .getElementById("cancel-bucket-item")
+        .addEventListener("click", () => {
+          bucketModal.style.display = "none";
+          bucketItemInput.value = "";
+        });
+
+      // Save new bucket list item
+      document
+        .getElementById("save-bucket-item")
+        .addEventListener("click", () => {
+          const description = bucketItemInput.value.trim();
+
+          if (description) {
+            bucketListItems.push({
+              description,
+              completed: false,
+            });
+
+            saveBucketList();
+            loadBucketList();
+            bucketModal.style.display = "none";
+            bucketItemInput.value = "";
+          }
+        });
+
+      // Close modal if clicking outside
+      bucketModal.addEventListener("click", (e) => {
+        if (e.target === bucketModal) {
+          bucketModal.style.display = "none";
+          bucketItemInput.value = "";
+        }
+      });
+
+      // Allow pressing Enter to save
+      bucketItemInput.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+          document.getElementById("save-bucket-item").click();
+        }
+      });
+
+      // Function to delete a bucket list item
+      function deleteBucketItem(index) {
+        bucketListItems.splice(index, 1);
+        saveBucketList();
+        loadBucketList();
+      }
+
+      // Initialize bucket list
+      loadBucketList();
     </script>
   </body>
 </html>
