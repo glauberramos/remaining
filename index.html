@@ -140,6 +140,14 @@
         margin-top: 20px;
       }
 
+      input[type="date"] {
+        color-scheme: dark;
+        background-color: none;
+        color: white;
+        border: none;
+        font-size: 1.4rem;
+      }
+
       @media (max-width: 900px) {
         .life-container {
           flex-direction: column;
@@ -159,14 +167,8 @@
 
       <div class="age-input-container">
         <div class="age-input-row">
-          <label for="age-input">Your current age:</label>
-          <input
-            type="number"
-            id="age-input"
-            min="0"
-            max="150"
-            step="0"
-          /><br />
+          <label for="birthdate-input">Your birthdate:</label>
+          <input type="date" id="birthdate-input" /><br />
           <label for="expected-age-input">Life expectancy:</label>
           <input
             type="number"
@@ -234,14 +236,38 @@
 
     <script>
       // Initial values
-      let currentAge = localStorage.getItem("currentAge") || 38;
+      let birthdateValue = localStorage.getItem("birthdate") || "";
       let expectedAge = localStorage.getItem("expectedAge") || 78;
+      let currentAge = 38; // Default value
 
-      document.getElementById("age-input").value = currentAge;
+      // Set initial field values
+      document.getElementById("birthdate-input").value = birthdateValue;
       document.getElementById("expected-age-input").value = expectedAge;
+
+      // Calculate age from birthdate
+      function calculateAge(birthdate) {
+        const today = new Date();
+        const birthDate = new Date(birthdate);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < birthDate.getDate())
+        ) {
+          age--;
+        }
+
+        return age;
+      }
 
       // Function to calculate and update everything
       function updateLifeProgress() {
+        // If we have a birthdate, calculate the current age
+        if (birthdateValue) {
+          currentAge = calculateAge(birthdateValue);
+        }
+
         const totalWeeks = expectedAge * 52;
         const livedWeeks = currentAge * 52;
         const remainingWeeks = totalWeeks - livedWeeks;
@@ -292,18 +318,13 @@
         getYearPercentage();
       updateLifeProgress();
 
-      // Add event listeners
+      // Update event listeners
       document
-        .getElementById("age-input")
-        .addEventListener("mouseup", function (event) {
-          const newAge = parseFloat(this.value);
-
-          localStorage.setItem("currentAge", newAge);
-
-          if (!isNaN(newAge) && newAge >= 0) {
-            currentAge = newAge;
-            updateLifeProgress();
-          }
+        .getElementById("birthdate-input")
+        .addEventListener("change", function (event) {
+          birthdateValue = this.value;
+          localStorage.setItem("birthdate", birthdateValue);
+          updateLifeProgress();
         });
 
       document
